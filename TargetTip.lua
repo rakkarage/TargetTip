@@ -16,9 +16,7 @@ local function GetUnitLabel(unit)
     local name = UnitName(unit)
     if not name then return nil end
 
-    if UnitIsUnit(unit, "player") then
-        return "|cFFffd700" .. name .. "|r"
-    elseif UnitIsPlayer(unit) then
+    if UnitIsPlayer(unit) then
         return GetClassColor(unit) .. name .. "|r"
     else
         local reaction = UnitReaction(unit, "player")
@@ -48,8 +46,8 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tool
     if not targetLabel then return end
 
     local targetTargetUnit = targetUnit .. "target"
-    local targetTargetLabel = not UnitIsUnit(targetUnit, "player") and GetUnitLabel(targetTargetUnit) or nil
-
+    local targetTargetLabel = GetUnitLabel(targetTargetUnit)
+    
     local line = ICON .. targetLabel
     if targetTargetLabel then
         line = line .. "    " .. ICON .. targetTargetLabel
