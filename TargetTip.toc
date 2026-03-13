@@ -3,7 +3,7 @@
 ## Notes: Shows average item level on player tooltips.
 ## Category: User Interface
 ## Author: rakkarage
-## IconTexture: Interface/AddOns/GearTip/GearTip.png
+## IconTexture: Interface/AddOns/TargetTip/TargetTip.png
 ## Version: v2026.3
 
-GearTip.lua
+TargetTip.lua
