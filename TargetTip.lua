@@ -47,7 +47,7 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tool
 
     local targetTargetUnit = targetUnit .. "target"
     local targetTargetLabel = GetUnitLabel(targetTargetUnit)
-    
+
     local line = ICON .. targetLabel
     if targetTargetLabel then
         line = line .. "    " .. ICON .. targetTargetLabel
