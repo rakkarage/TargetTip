@@ -1,5 +1,5 @@
 -- TargetTip
--- Shows Show targets target & targetoftarget on player tooltips.
+-- Shows `target` & `targetoftarget` on unit tooltips.
 
 local ICON = "|TInterface\\Icons\\ability_marksmanship:14|t "
 
