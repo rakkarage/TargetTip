@@ -15,20 +15,25 @@ local function GetUnitLabel(unit)
     if not UnitExists(unit) then return nil end
     local name = UnitName(unit)
     if not name then return nil end
-
     if UnitIsPlayer(unit) then
         return GetClassColor(unit) .. name .. "|r"
     else
-        local reaction = UnitReaction(unit, "player")
         local color
         if UnitIsDead(unit) then
-            color = "|cFF888888"
-        elseif reaction and reaction >= 5 then
-            color = "|cFF1eff00"
-        elseif reaction and reaction == 4 then
-            color = "|cFFffff00"
+            color = "|cFFb2b2b2"
         else
-            color = "|cFFff2020"
+            local reaction = UnitReaction(unit, "player")
+            if reaction then
+                if reaction >= 5 then
+                    color = "|cFF4db24d"
+                elseif reaction == 4 then
+                    color = "|cFFb2b200"
+                else
+                    color = "|cFFb24d4d"
+                end
+            else
+                color = "|cFFffffff"
+            end
         end
         return color .. name .. "|r"
     end
