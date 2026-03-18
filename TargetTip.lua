@@ -3,7 +3,7 @@
 
 local ICON = "|TInterface\\Icons\\ability_marksmanship:14|t "
 
-local function GetClassColor(unit)
+local function GetColor(unit)
     local _, classFile = UnitClass(unit)
     if not classFile then return "|cFFaaaaaa" end
     local c = RAID_CLASS_COLORS[classFile]
@@ -16,7 +16,7 @@ local function GetUnitLabel(unit)
     local name = UnitName(unit)
     if not name then return nil end
     if UnitIsPlayer(unit) then
-        return GetClassColor(unit) .. name .. "|r"
+        return GetColor(unit) .. name .. "|r"
     else
         local color
         if UnitIsDead(unit) then
