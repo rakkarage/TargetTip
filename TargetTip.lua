@@ -3,12 +3,22 @@
 
 local ICON = "|TInterface\\Icons\\ability_marksmanship:14|t "
 
+local classColorCache = {}
+
 local function GetColor(unit)
     local _, classFile = UnitClass(unit)
     if not classFile then return "|cFFaaaaaa" end
+
+    if classColorCache[classFile] then
+        return classColorCache[classFile]
+    end
+
     local c = RAID_CLASS_COLORS[classFile]
     if not c then return "|cFFaaaaaa" end
-    return string.format("|cFF%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
+
+    local colorString = string.format("|cFF%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
+    classColorCache[classFile] = colorString
+    return colorString
 end
 
 local function GetUnitLabel(unit)
@@ -19,21 +29,17 @@ local function GetUnitLabel(unit)
         return GetColor(unit) .. name .. "|r"
     else
         local color
-        if UnitIsDead(unit) then
-            color = "|cFFb2b2b2"
-        else
-            local reaction = UnitReaction(unit, "player")
-            if reaction then
-                if reaction >= 5 then
-                    color = "|cFF4db24d"
-                elseif reaction == 4 then
-                    color = "|cFFb2b200"
-                else
-                    color = "|cFFb24d4d"
-                end
+        local reaction = UnitReaction(unit, "player")
+        if reaction then
+            if reaction >= 5 then
+                color = "|cFF4db24d"
+            elseif reaction == 4 then
+                color = "|cFFb2b200"
             else
-                color = "|cFFffffff"
+                color = "|cFFb24d4d"
             end
+        else
+            color = "|cFFffffff"
         end
         return color .. name .. "|r"
     end
@@ -59,5 +65,4 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tool
     end
 
     tooltip:AddLine(line)
-    tooltip:Show()
 end)
