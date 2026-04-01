@@ -4,6 +4,6 @@
 ## Category: User Interface
 ## Author: rakkarage
 ## IconTexture: Interface/AddOns/TargetTip/TargetTip.png
-## Version: v2026.3
+## Version: v2026.4
 
 TargetTip.lua
