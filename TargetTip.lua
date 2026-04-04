@@ -1,15 +1,32 @@
 -- TargetTip
 -- Shows `target` & `targetoftarget` on unit tooltips.
+local ICON_NPC = "|TInterface\\Icons\\ability_marksmanship:14|t "
+local ROLE_ICONS = {
+	TANK    = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:0:19:22:41|t ",
+	HEALER  = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:20:39:1:20|t ",
+	DAMAGER = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:20:39:22:41|t ",
+}
+local CLASS_ICONS = {}
+for classFile, coords in pairs(CLASS_ICON_TCOORDS) do
+	CLASS_ICONS[classFile] = string.format(
+		"|TInterface\\WorldStateFrame\\Icons-Classes:14:14:0:0:256:256:%d:%d:%d:%d|t ",
+		coords[1] * 256, coords[2] * 256, coords[3] * 256, coords[4] * 256)
+end
 
-local ICON = "|TInterface\\Icons\\ability_marksmanship:14|t "
 local classColorCache = {}
+local nameCache = {}
+
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("PLAYER_LOGIN")
+frame:SetScript("OnEvent", function()
+	wipe(classColorCache)
+	wipe(nameCache)
+end)
 
 local function GetColor(unit)
 	local _, classFile = UnitClass(unit)
 	if not classFile then return "|cFFaaaaaa" end
-	if classColorCache[classFile] then
-		return classColorCache[classFile]
-	end
+	if classColorCache[classFile] then return classColorCache[classFile] end
 	local c = RAID_CLASS_COLORS[classFile]
 	if not c then return "|cFFaaaaaa" end
 	local colorString = string.format("|cFF%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
@@ -26,14 +43,32 @@ local function GetReactionColor(unit)
 	return "|cFFaaaaaa"
 end
 
+local function GetCachedName(unit)
+	local guid = UnitGUID(unit)
+	if guid and not issecretvalue(guid) then
+		if nameCache[guid] then return nameCache[guid] end
+		local name = UnitName(unit)
+		if name then nameCache[guid] = name end
+		return name
+	end
+	return UnitName(unit)
+end
+
+local function GetRoleIcon(unit)
+	local role = UnitGroupRolesAssigned(unit)
+	if role and ROLE_ICONS[role] then return ROLE_ICONS[role] end
+	local _, classFile = UnitClass(unit)
+	return classFile and CLASS_ICONS[classFile] or ""
+end
+
 local function GetUnitLabel(unit)
 	if not UnitExists(unit) then return nil end
-	local name = UnitName(unit)
+	local name = GetCachedName(unit)
 	if not name then return nil end
 	if UnitIsPlayer(unit) then
-		return GetColor(unit) .. name .. "|r"
+		return GetRoleIcon(unit) .. GetColor(unit) .. name .. "|r"
 	else
-		return GetReactionColor(unit) .. name .. "|r"
+		return ICON_NPC .. GetReactionColor(unit) .. name .. "|r"
 	end
 end
 
@@ -45,11 +80,10 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tool
 	local targetUnit = unit .. "target"
 	local targetLabel = GetUnitLabel(targetUnit)
 	if not targetLabel then return end
-	local targetTargetUnit = targetUnit .. "target"
-	local targetTargetLabel = GetUnitLabel(targetTargetUnit)
-	local line = ICON .. targetLabel
+	local targetTargetLabel = GetUnitLabel(targetUnit .. "target")
+	local line = targetLabel
 	if targetTargetLabel then
-		line = line .. "    " .. ICON .. targetTargetLabel
+		line = line .. "    " .. targetTargetLabel
 	end
 	tooltip:AddLine(line)
 end)
