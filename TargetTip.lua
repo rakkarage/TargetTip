@@ -1,5 +1,5 @@
--- TargetTip
--- Shows `target` & `targetoftarget` on unit tooltips.
+-- TargetTip: Shows target information on unit tooltips
+
 local ICON_NPC = "|TInterface\\Icons\\ability_marksmanship:14|t "
 local ROLE_ICONS = {
 	TANK    = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:0:19:22:41|t ",
