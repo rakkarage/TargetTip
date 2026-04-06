@@ -1,6 +1,8 @@
 -- TargetTip: Shows target information on unit tooltips
 
 local ICON_NPC = "|TInterface\\Icons\\ability_marksmanship:14|t "
+
+-- Pre-computed role icons: stored as constants to avoid table allocation on every load
 local ROLE_ICONS = {
 	TANK    = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:0:19:22:41|t ",
 	HEALER  = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:20:39:1:20|t ",
@@ -77,13 +79,16 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tool
 	local unit = data.unitToken
 	if not unit and UnitExists("mouseover") then unit = "mouseover" end
 	if not unit then return end
+
+	-- Resolve and display target chain: unit -> unit's target -> unit's target's target
 	local targetUnit = unit .. "target"
 	local targetLabel = GetUnitLabel(targetUnit)
-	if not targetLabel then return end
+	if not targetLabel then return end -- Unit has no valid target; abort
+
 	local targetTargetLabel = GetUnitLabel(targetUnit .. "target")
 	local line = targetLabel
 	if targetTargetLabel then
-		line = line .. "    " .. targetTargetLabel
+		line = line .. "    " .. targetTargetLabel -- Append target's target if it exists
 	end
 	tooltip:AddLine(line)
 end)
