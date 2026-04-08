@@ -1,9 +1,9 @@
-## Interface: 120001
 ## Title: TargetTip
 ## Notes: Shows average item level on unit tooltips.
 ## Category: User Interface
 ## Author: rakkarage
 ## IconTexture: Interface/AddOns/TargetTip/TargetTip.png
+## Interface: 120001
 ## Version: v2026.4
 
 TargetTip.lua
