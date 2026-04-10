@@ -1,5 +1,5 @@
 ## Title: TargetTip
-## Notes: Shows average item level on unit tooltips.
+## Notes: Shows target information on unit tooltips.
 ## Category: User Interface
 ## Author: rakkarage
 ## IconTexture: Interface/AddOns/TargetTip/TargetTip.png

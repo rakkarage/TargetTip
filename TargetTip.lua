@@ -1,4 +1,4 @@
--- TargetTip: Shows target information on unit tooltips
+-- 🎯 TargetTip: Shows target information on unit tooltips.
 
 local ICON_NPC = "|TInterface\\Icons\\ability_marksmanship:14|t "
 

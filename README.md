@@ -2,4 +2,4 @@
 
 ![screenshot](screenshot.png)
 
-Shows `target` & `targetoftarget` on unit tooltips.
+Shows target information on unit tooltips.
