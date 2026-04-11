@@ -45,8 +45,15 @@ local function GetReactionColor(unit)
 	return "|cFFaaaaaa"
 end
 
+-- Guard UnitGUID for compound tokens (e.g. mouseovertarget).
+local function GetSafeGUID(unit)
+	local ok, guid = pcall(UnitGUID, unit)
+	if ok then return guid end
+	return nil
+end
+
 local function GetCachedName(unit)
-	local guid = UnitGUID(unit)
+	local guid = GetSafeGUID(unit)
 	if guid and not issecretvalue(guid) then
 		if nameCache[guid] then return nameCache[guid] end
 		local name = UnitName(unit)
