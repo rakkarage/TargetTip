@@ -1,8 +1,12 @@
 -- 🎯 TargetTip: Shows target information on unit tooltips.
 
+local _, ns = ...
+
+ns.TargetTip = CreateFrame("Frame")
+local TargetTip = ns.TargetTip
+
 local ICON_NPC = "|TInterface\\Icons\\ability_marksmanship:14|t "
 
--- Pre-computed role icons: stored as constants to avoid table allocation on every load
 local ROLE_ICONS = {
 	TANK    = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:0:19:22:41|t ",
 	HEALER  = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:20:39:1:20|t ",
@@ -15,24 +19,23 @@ for classFile, coords in pairs(CLASS_ICON_TCOORDS) do
 		coords[1] * 256, coords[2] * 256, coords[3] * 256, coords[4] * 256)
 end
 
-local classColorCache = {}
-local nameCache = {}
+TargetTip.classColorCache = {}
+TargetTip.nameCache = {}
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("PLAYER_LOGIN")
-frame:SetScript("OnEvent", function()
-	wipe(classColorCache)
-	wipe(nameCache)
+TargetTip:RegisterEvent("PLAYER_LOGIN")
+TargetTip:SetScript("OnEvent", function()
+	wipe(TargetTip.classColorCache)
+	wipe(TargetTip.nameCache)
 end)
 
 local function GetColor(unit)
 	local _, classFile = UnitClass(unit)
 	if not classFile then return "|cFFaaaaaa" end
-	if classColorCache[classFile] then return classColorCache[classFile] end
+	if TargetTip.classColorCache[classFile] then return TargetTip.classColorCache[classFile] end
 	local c = RAID_CLASS_COLORS[classFile]
 	if not c then return "|cFFaaaaaa" end
 	local colorString = string.format("|cFF%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
-	classColorCache[classFile] = colorString
+	TargetTip.classColorCache[classFile] = colorString
 	return colorString
 end
 
@@ -45,7 +48,6 @@ local function GetReactionColor(unit)
 	return "|cFFaaaaaa"
 end
 
--- Guard UnitGUID for compound tokens (e.g. mouseovertarget).
 local function GetSafeGUID(unit)
 	local ok, guid = pcall(UnitGUID, unit)
 	if ok then return guid end
@@ -55,9 +57,9 @@ end
 local function GetCachedName(unit)
 	local guid = GetSafeGUID(unit)
 	if guid and not issecretvalue(guid) then
-		if nameCache[guid] then return nameCache[guid] end
+		if TargetTip.nameCache[guid] then return TargetTip.nameCache[guid] end
 		local name = UnitName(unit)
-		if name then nameCache[guid] = name end
+		if name then TargetTip.nameCache[guid] = name end
 		return name
 	end
 	return UnitName(unit)
@@ -87,15 +89,14 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tool
 	if not unit and UnitExists("mouseover") then unit = "mouseover" end
 	if not unit then return end
 
-	-- Resolve and display target chain: unit -> unit's target -> unit's target's target
 	local targetUnit = unit .. "target"
 	local targetLabel = GetUnitLabel(targetUnit)
-	if not targetLabel then return end -- Unit has no valid target; abort
+	if not targetLabel then return end
 
 	local targetTargetLabel = GetUnitLabel(targetUnit .. "target")
 	local line = targetLabel
 	if targetTargetLabel then
-		line = line .. "    " .. targetTargetLabel -- Append target's target if it exists
+		line = line .. "    " .. targetTargetLabel
 	end
 	tooltip:AddLine(line)
 end)
