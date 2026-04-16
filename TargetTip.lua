@@ -28,14 +28,14 @@ TargetTip:SetScript("OnEvent", function()
 	wipe(TargetTip.nameCache)
 end)
 
-local function GetColor(unit)
+function TargetTip:GetColor(unit)
 	local _, classFile = UnitClass(unit)
 	if not classFile then return "|cFFaaaaaa" end
-	if TargetTip.classColorCache[classFile] then return TargetTip.classColorCache[classFile] end
+	if self.classColorCache[classFile] then return self.classColorCache[classFile] end
 	local c = RAID_CLASS_COLORS[classFile]
 	if not c then return "|cFFaaaaaa" end
 	local colorString = string.format("|cFF%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
-	TargetTip.classColorCache[classFile] = colorString
+	self.classColorCache[classFile] = colorString
 	return colorString
 end
 
@@ -77,7 +77,7 @@ local function GetUnitLabel(unit)
 	local name = GetCachedName(unit)
 	if not name then return nil end
 	if UnitIsPlayer(unit) then
-		return GetRoleIcon(unit) .. GetColor(unit) .. name .. "|r"
+		return GetRoleIcon(unit) .. TargetTip:GetColor(unit) .. name .. "|r"
 	else
 		return ICON_NPC .. GetReactionColor(unit) .. name .. "|r"
 	end
