@@ -1,41 +1,38 @@
 -- 🎯 TargetTip: Shows target information on unit tooltips.
 
-local _, ns = ...
+local frame = CreateFrame("Frame")
 
-ns.TargetTip = CreateFrame("Frame")
-local TargetTip = ns.TargetTip
+local classColorCache = {}
+local nameCache = {}
 
 local ICON_NPC = "|TInterface\\Icons\\ability_marksmanship:14|t "
-
+local CLASS_ICONS = {}
 local ROLE_ICONS = {
 	TANK    = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:0:19:22:41|t ",
 	HEALER  = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:20:39:1:20|t ",
 	DAMAGER = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:20:39:22:41|t ",
 }
-local CLASS_ICONS = {}
-for classFile, coords in pairs(CLASS_ICON_TCOORDS) do
-	CLASS_ICONS[classFile] = string.format(
-		"|TInterface\\WorldStateFrame\\Icons-Classes:14:14:0:0:256:256:%d:%d:%d:%d|t ",
-		coords[1] * 256, coords[2] * 256, coords[3] * 256, coords[4] * 256)
-end
 
-TargetTip.classColorCache = {}
-TargetTip.nameCache = {}
+frame:RegisterEvent("PLAYER_LOGIN")
+frame:SetScript("OnEvent", function()
+	for classFile, coords in pairs(CLASS_ICON_TCOORDS) do
+		CLASS_ICONS[classFile] = string.format(
+			"|TInterface\\WorldStateFrame\\Icons-Classes:14:14:0:0:256:256:%d:%d:%d:%d|t ",
+			coords[1] * 256, coords[2] * 256, coords[3] * 256, coords[4] * 256)
+	end
 
-TargetTip:RegisterEvent("PLAYER_LOGIN")
-TargetTip:SetScript("OnEvent", function()
-	wipe(TargetTip.classColorCache)
-	wipe(TargetTip.nameCache)
+	wipe(classColorCache)
+	wipe(nameCache)
 end)
 
-function TargetTip:GetColor(unit)
+local function GetColor(unit)
 	local _, classFile = UnitClass(unit)
 	if not classFile then return "|cFFaaaaaa" end
-	if self.classColorCache[classFile] then return self.classColorCache[classFile] end
+	if classColorCache[classFile] then return classColorCache[classFile] end
 	local c = RAID_CLASS_COLORS[classFile]
 	if not c then return "|cFFaaaaaa" end
 	local colorString = string.format("|cFF%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
-	self.classColorCache[classFile] = colorString
+	classColorCache[classFile] = colorString
 	return colorString
 end
 
@@ -57,9 +54,9 @@ end
 local function GetCachedName(unit)
 	local guid = GetSafeGUID(unit)
 	if guid and not issecretvalue(guid) then
-		if TargetTip.nameCache[guid] then return TargetTip.nameCache[guid] end
+		if nameCache[guid] then return nameCache[guid] end
 		local name = UnitName(unit)
-		if name then TargetTip.nameCache[guid] = name end
+		if name then nameCache[guid] = name end
 		return name
 	end
 	return UnitName(unit)
@@ -77,7 +74,7 @@ local function GetUnitLabel(unit)
 	local name = GetCachedName(unit)
 	if not name then return nil end
 	if UnitIsPlayer(unit) then
-		return GetRoleIcon(unit) .. TargetTip:GetColor(unit) .. name .. "|r"
+		return GetRoleIcon(unit) .. GetColor(unit) .. name .. "|r"
 	else
 		return ICON_NPC .. GetReactionColor(unit) .. name .. "|r"
 	end
