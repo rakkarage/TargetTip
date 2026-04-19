@@ -1,9 +1,9 @@
 -- 🎯 TargetTip: Shows target information on unit tooltips.
 
-local frame = CreateFrame("Frame")
+local _frame = CreateFrame("Frame")
 
-local classColorCache = {}
-local nameCache = {}
+local _classColorCache = {}
+local _nameCache = {}
 
 local ICON_NPC = "|TInterface\\Icons\\ability_marksmanship:14|t "
 local CLASS_ICONS = {}
@@ -13,26 +13,26 @@ local ROLE_ICONS = {
 	DAMAGER = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:20:39:22:41|t ",
 }
 
-frame:RegisterEvent("PLAYER_LOGIN")
-frame:SetScript("OnEvent", function()
+_frame:RegisterEvent("PLAYER_LOGIN")
+_frame:SetScript("OnEvent", function()
 	for classFile, coords in pairs(CLASS_ICON_TCOORDS) do
 		CLASS_ICONS[classFile] = string.format(
 			"|TInterface\\WorldStateFrame\\Icons-Classes:14:14:0:0:256:256:%d:%d:%d:%d|t ",
 			coords[1] * 256, coords[2] * 256, coords[3] * 256, coords[4] * 256)
 	end
 
-	wipe(classColorCache)
-	wipe(nameCache)
+	wipe(_classColorCache)
+	wipe(_nameCache)
 end)
 
 local function GetColor(unit)
 	local _, classFile = UnitClass(unit)
 	if not classFile then return "|cFFaaaaaa" end
-	if classColorCache[classFile] then return classColorCache[classFile] end
+	if _classColorCache[classFile] then return _classColorCache[classFile] end
 	local c = RAID_CLASS_COLORS[classFile]
 	if not c then return "|cFFaaaaaa" end
 	local colorString = string.format("|cFF%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
-	classColorCache[classFile] = colorString
+	_classColorCache[classFile] = colorString
 	return colorString
 end
 
@@ -54,9 +54,9 @@ end
 local function GetCachedName(unit)
 	local guid = GetSafeGUID(unit)
 	if guid and not issecretvalue(guid) then
-		if nameCache[guid] then return nameCache[guid] end
+		if _nameCache[guid] then return _nameCache[guid] end
 		local name = UnitName(unit)
-		if name then nameCache[guid] = name end
+		if name then _nameCache[guid] = name end
 		return name
 	end
 	return UnitName(unit)
